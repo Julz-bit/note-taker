@@ -1,12 +1,18 @@
 import { Body, Controller, Get, Patch, Query, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../common/guards';
 import { Roles } from '../common/decorators/role.decorator';
 import { Role } from '../common/conts';
 import { PaginateDto } from '../common/dtos';
 import { AssignRoleDto } from './dto';
+import { PaginatedUsersEntity, UserEntity } from './entities';
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -17,6 +23,7 @@ export class UserController {
 
   @Get()
   @ApiOperation({ summary: 'Retrieve users list' })
+  @ApiOkResponse({ description: 'Users retrieved', type: PaginatedUsersEntity })
   @Roles(Role.Admin)
   async findAll(@Query() query: PaginateDto) {
     return await this.userService.findAll(query);
@@ -24,6 +31,7 @@ export class UserController {
 
   @Patch()
   @ApiOperation({ summary: 'Update user role' })
+  @ApiOkResponse({ description: 'assign role successfully', type: UserEntity })
   @Roles(Role.Admin)
   async assignRole(@Body() dto: AssignRoleDto) {
     return await this.userService.assignRole(dto);
